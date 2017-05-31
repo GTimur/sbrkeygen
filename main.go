@@ -21,15 +21,15 @@ var (
 	dispdate map[int]int
 )
 
-const  datapath = "..\\sbrkeygen-data"
-
+const datapath = "..\\sbrkeygen-data"
 
 func main() {
 	// Баннер
 	fmt.Println("SBERBANK TELEX KEY GENERATOR (C) 2017 ver.0.1")
 	// Инициализация web-сервера
+	keygen.WaitExit = false; //флаг для завершения работы
 	var web keygen.WebCtl
-	keygen.GlobalConfig.SetManagerSrv("127.0.0.1",4040)
+	keygen.GlobalConfig.SetManagerSrv("127.0.0.1", 4040)
 	fmt.Println("Web control configured: " + "http://" + keygen.GlobalConfig.ManagerSrvAddr() + ":" + strconv.Itoa(int(keygen.GlobalConfig.ManagerSrvPort())))
 	web.SetHost(net.ParseIP(keygen.GlobalConfig.ManagerSrvAddr()))
 	web.SetPort(keygen.GlobalConfig.ManagerSrvPort())
@@ -46,33 +46,44 @@ func main() {
 	go func() {
 		for sig := range c {
 			fmt.Printf("\nReceived %v, shutdown procedure initiated.\n\n", sig)
-			//courgo.WaitExit = true
+			keygen.WaitExit = true
 		}
 	}()
 
-	amount, err = ReadAmount(filepath.Join(datapath,"amount.txt"))
+	amount, err = ReadAmount(filepath.Join(datapath, "amount.txt"))
 	if err != nil {
 		log.Fatal("Ошибка чтения файла кодов сумм (amount.txt):", err)
 	}
-	currency, err = ReadCurrency(filepath.Join(datapath,"currency.txt"))
+	currency, err = ReadCurrency(filepath.Join(datapath, "currency.txt"))
 	if err != nil {
 		log.Fatal("Ошибка чтения файла кодов валют (currency.txt):", err)
 	}
-	fixed, err = ReadFixed(filepath.Join(datapath,"fixed.txt"))
+	fixed, err = ReadFixed(filepath.Join(datapath, "fixed.txt"))
 	if err != nil {
 		log.Fatal("Ошибка чтения файла fixed.txt:", err)
 	}
 
-	dispdate, err = ReadDispDate(filepath.Join(datapath,"calendar.txt"))
+	dispdate, err = ReadDispDate(filepath.Join(datapath, "calendar.txt"))
 	if err != nil {
 		log.Fatal("Ошибка чтения файла calendar.txt:", err)
 	}
 
-	fmt.Println("res:", dispdate[GetDate(2)],GetDate(3))
+	fmt.Println("res:", dispdate[GetDate(2)], GetDate(3))
 	fmt.Println(CalcAmount(1000))
 
-	reader := bufio.NewReader(os.Stdin)
-	reader.ReadString('\n')
+//	reader := bufio.NewReader(os.Stdin)
+//	reader.ReadString('\n')
+
+	ticker := time.NewTicker(time.Second * 2)
+
+	for range ticker.C {
+		// Запускаем обработчик каждую минуту
+		if !keygen.WaitExit {
+			continue
+		}
+		break
+	}
+	ticker.Stop()
 }
 
 
@@ -252,7 +263,7 @@ func ReadDispDate(filename string) (dispdate map[int]int, err error) {
 // shift = двиг от текущей даты в днях
 func GetDate(shift int) int {
 	date := time.Now()
-	date = date.Add(time.Duration(shift)*24* time.Hour)
+	date = date.Add(time.Duration(shift) * 24 * time.Hour)
 	//res := strconv.Itoa(date.Year()) //ГГГГ
 	res := fmt.Sprintf("%2d", int(date.Month())) //ММ
 	res += fmt.Sprintf("%02d", date.Day()) //ДД

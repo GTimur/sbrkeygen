@@ -30,10 +30,10 @@ type managerSrv struct {
 }
 
 type Page struct {
-	Title    string
-	Body     template.HTML
-	LnkHome  string
-	DateNow  template.HTML
+	Title   string
+	Body    template.HTML
+	LnkHome string
+	DateNow template.HTML
 }
 
 
@@ -41,6 +41,7 @@ type Page struct {
 var (
 	GlobalConfig Config = Config{}
 	home_template = template.Must(template.ParseFiles(path.Join("static", "tpl", "main.gtpl"), path.Join("static", "tpl", "index.gtpl")))
+	WaitExit bool
 )
 
 /*Сервер*/
@@ -69,7 +70,7 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 	lnkhome := "http://" + GlobalConfig.managerSrv.Addr + ":" + strconv.Itoa(int(GlobalConfig.managerSrv.Port))
 	//page := Page{title, template.HTML(body), lnkhome, "" }
 	now := time.Now()
-	datenow := now.Format("31/01/2017")
+	datenow := now.Format("02/01/2006")
 	page := Page{title, template.HTML(body), lnkhome, template.HTML(datenow)}
 
 	if r.Method == "GET" {
@@ -92,20 +93,22 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 			log.Println("Handshake error: ", err)
 		}
 
-		fmt.Println("POST:",jh["Post"])
+		fmt.Println("POST:", jh["Post"])
 
 		enc := json.NewEncoder(w)
 		switch jh["Post"] {
 		case "SaveButton":
 			fmt.Println("SaveButton pressed")
 			enc.Encode("SaveOk")
+		case "ExitButton":
+			enc.Encode("ExitOk")
+			WaitExit = true
 		default:
 			//Отправляем ответ на POST-запрос
 			//для предотвращения ошибки JSON parse error в ajax методе
 			enc.Encode("No action requested.")
 		}
 	}
-
 }
 
 
