@@ -8,6 +8,10 @@ import (
 	"strconv"
 	"log"
 	"time"
+	"path/filepath"
+	"sbrkeygen/modules"
+	"os/signal"
+	"net"
 )
 
 var (
@@ -17,30 +21,58 @@ var (
 	dispdate map[int]int
 )
 
+const  datapath = "..\\sbrkeygen-data"
+
+
 func main() {
+	// Баннер
 	fmt.Println("SBERBANK TELEX KEY GENERATOR (C) 2017 ver.0.1")
-	fmt.Println("")
-	var err error
-	amount, err = ReadAmount("amount.txt")
+	// Инициализация web-сервера
+	var web keygen.WebCtl
+	keygen.GlobalConfig.SetManagerSrv("127.0.0.1",4040)
+	fmt.Println("Web control configured: " + "http://" + keygen.GlobalConfig.ManagerSrvAddr() + ":" + strconv.Itoa(int(keygen.GlobalConfig.ManagerSrvPort())))
+	web.SetHost(net.ParseIP(keygen.GlobalConfig.ManagerSrvAddr()))
+	web.SetPort(keygen.GlobalConfig.ManagerSrvPort())
+	/* Запускаем сервер обслуживания WebCtl */
+	err := web.StartServe()
+	if err != nil {
+		log.Println("HTTP сервер: Ошибка. ", err)
+		os.Exit(1)
+	}
+
+	/* Перехват CTRL+C для завершения приложения */
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			fmt.Printf("\nReceived %v, shutdown procedure initiated.\n\n", sig)
+			//courgo.WaitExit = true
+		}
+	}()
+
+	amount, err = ReadAmount(filepath.Join(datapath,"amount.txt"))
 	if err != nil {
 		log.Fatal("Ошибка чтения файла кодов сумм (amount.txt):", err)
 	}
-	currency, err = ReadCurrency("currency.txt")
+	currency, err = ReadCurrency(filepath.Join(datapath,"currency.txt"))
 	if err != nil {
 		log.Fatal("Ошибка чтения файла кодов валют (currency.txt):", err)
 	}
-	fixed, err = ReadFixed("fixed.txt")
+	fixed, err = ReadFixed(filepath.Join(datapath,"fixed.txt"))
 	if err != nil {
 		log.Fatal("Ошибка чтения файла fixed.txt:", err)
 	}
 
-	dispdate, err = ReadDispDate("calendar.txt")
+	dispdate, err = ReadDispDate(filepath.Join(datapath,"calendar.txt"))
 	if err != nil {
 		log.Fatal("Ошибка чтения файла calendar.txt:", err)
 	}
 
 	fmt.Println("res:", dispdate[GetDate(2)],GetDate(3))
 	fmt.Println(CalcAmount(1000))
+
+	reader := bufio.NewReader(os.Stdin)
+	reader.ReadString('\n')
 }
 
 

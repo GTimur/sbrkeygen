@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="GOPATH &lt;testkeygen&gt;">
+  <library name="GOPATH &lt;modules&gt;">
     <CLASSES>
       <root url="file://C:/Go/src/path" />
       <root url="file://C:/Go/src/reflect" />
@@ -119,6 +119,7 @@
     </SOURCES>
     <excluded>
       <root url="file://$PROJECT_DIR$" />
+      <root url="file://$PROJECT_DIR$/modules" />
     </excluded>
   </library>
 </component>
