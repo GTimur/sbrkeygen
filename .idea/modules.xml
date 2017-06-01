@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/testkeygen.iml" filepath="$PROJECT_DIR$/testkeygen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sbrkeygen.iml" filepath="$PROJECT_DIR$/sbrkeygen.iml" />
     </modules>
   </component>
 </project>

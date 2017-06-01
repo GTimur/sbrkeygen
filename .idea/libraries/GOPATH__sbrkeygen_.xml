@@ -1,0 +1,28 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;sbrkeygen&gt;">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../hugo" />
+      <root url="file://$PROJECT_DIR$/../kernighan" />
+      <root url="file://$PROJECT_DIR$/../sbrkeygen-data" />
+      <root url="file://$PROJECT_DIR$/../github.com" />
+      <root url="file://$PROJECT_DIR$/../golang.org" />
+      <root url="file://$PROJECT_DIR$/../gopl.io" />
+      <root url="file://$PROJECT_DIR$/../storyhugo" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../hugo" />
+      <root url="file://$PROJECT_DIR$/../kernighan" />
+      <root url="file://$PROJECT_DIR$/../sbrkeygen-data" />
+      <root url="file://$PROJECT_DIR$/../github.com" />
+      <root url="file://$PROJECT_DIR$/../golang.org" />
+      <root url="file://$PROJECT_DIR$/../gopl.io" />
+      <root url="file://$PROJECT_DIR$/../storyhugo" />
+    </SOURCES>
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>

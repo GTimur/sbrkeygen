@@ -1,0 +1,29 @@
+{{define "head"}}
+<style>
+ul {
+    width: 50%;
+    margin: auto;
+}
+</style>
+{{end}}
+{{define "title"}}{{.Title}} {{end}}
+{{define "body"}}
+{{.Body}}
+<form class="form-horizontal" id="register-subscribers" action="/" method="post">
+<nav class="navbar navbar-default">
+  <ul class="nav navbar-nav">
+    <li><a href="{{.LnkHome}}">SBR KEY GENERATOR</a></li>
+  </ul>
+  <p class="navbar-text"></p>
+</nav>
+<fieldset>
+<!-- Form Name -->
+<div class="jumbotron text-center">
+  <h1>SBR KEY GENERATOR</h1>
+  <p>Утилита формирования ключа для телекса</p> 
+</div>
+<ul class="list-group">
+  <li class="list-group-item"><a href="{{.LnkHome}}/">Статистика работы программы</a></li>
+</ul>
+{{end}}
+{{define "scripts"}}{{end}}
