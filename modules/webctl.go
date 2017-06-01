@@ -94,19 +94,17 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 			log.Println("Handshake error: ", err)
 		}
 
-		fmt.Println("POST:", jh["Post"])
-
 		enc := json.NewEncoder(w)
 		switch jh["Post"] {
 		case "SaveButton":
 			sum, err := strconv.Atoi(jh["suminput"])
-			if err != nil {
+			if (err != nil) || (sum <= 0) {
 				enc.Encode("SaveNotOkSUM")
 				break
 			}
 			cnt, err := strconv.Atoi(jh["seqcounter"])
-			if err != nil {
-				enc.Encode("SaveNotOkSUM")
+			if (err != nil) || (cnt <= 0 && cnt >= 128) {
+				enc.Encode("SaveNotOk")
 				break
 			}
 			key := CalcKey(sum, jh["selectcur"], SeqCnt, false, 0)
@@ -127,13 +125,14 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 
 		case "CalcButton":
 			sum, err := strconv.Atoi(jh["suminput"])
-			if err != nil {
+			if (err != nil) || (sum <= 0) {
 				enc.Encode("CalcNotOk")
 				break
 			}
+
 			cnt, err := strconv.Atoi(jh["seqcounter"])
-			if err != nil {
-				enc.Encode("SaveNotOkSUM")
+			if (err != nil) || (cnt <= 0 && cnt >= 128) {
+				enc.Encode("CalcNotOk")
 				break
 			}
 

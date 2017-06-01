@@ -21,7 +21,7 @@ ul {
   <div class="col-md-4">	
 	<div class="input-group">	  
 	  <span class="input-group-addon">Руб</span>
-	  <input type="text" class="form-control" aria-label="Окргулено до рубля" id="suminput" name="suminput" type="text" placeholder="10">
+	  <input type="text" class="form-control" aria-label="Окргулено до рубля" id="suminput" name="suminput" type="text" placeholder="0">
 	  <span class="input-group-addon">.00</span>
 	</div>
 	<span class="help-block">Сумма сделки</span>    

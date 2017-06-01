@@ -218,7 +218,7 @@ func CalcCurrency(cur string) int {
 
 // Возврат кода для Seq
 func CalcSeq(seq int, isfrom bool) int {
-	if seq < 0 || seq > 128 {
+	if seq <= 0 || seq > 128 {
 		seq = 1
 		SeqCnt = 1
 		UpdateSeqCnt(1)
@@ -449,7 +449,7 @@ func InitData() (err error) {
 	}
 	// Зададим номер следующего сообщения
 	SeqCnt += 1;
-	if SeqCnt < 0 || SeqCnt > 128 {
+	if SeqCnt <= 0 || SeqCnt > 128 {
 		SeqCnt = 1
 		UpdateSeqCnt(1)
 	}
