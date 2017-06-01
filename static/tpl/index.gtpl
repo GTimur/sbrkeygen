@@ -21,7 +21,7 @@ ul {
   <div class="col-md-4">	
 	<div class="input-group">	  
 	  <span class="input-group-addon">Руб</span>
-	  <input type="text" class="form-control" aria-label="Окргулено до рубля" id="suminput" name="suminput" type="text" placeholder="10000000">
+	  <input type="text" class="form-control" aria-label="Окргулено до рубля" id="suminput" name="suminput" type="text" placeholder="10">
 	  <span class="input-group-addon">.00</span>
 	</div>
 	<span class="help-block">Сумма сделки</span>    
@@ -31,33 +31,75 @@ ul {
 
 <!-- Select Basic -->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="selectbasic">Валюта</label>
+  <label class="col-md-4 control-label" for="selectcur">Валюта</label>
   <div class="col-md-2">
-    <select id="selectbasic" name="selectbasic" class="form-control">
-      <option value="RUB">RUB</option>
-      <option value="NOC">NOC</option>
-      <option value="OTH">OTH</option>
-      <option value="USD">USD</option>
-      <option value="EUR">EUR</option>
+    <select id="selectcur" name="selectcur" class="form-control">
+    <option value="RUB">RUB</option>
+    <option value="NOC">NOC</option>
+    <option value="OTH">OTH</option>
+    <option value="USD">USD</option>
+    <option value="EUR">EUR</option>
     </select>
-  </div>
+ </div>
 </div>
+
 
 <!-- Textarea -->
 <div class="form-group">
   <label class="col-md-4 control-label" for="textarea">Сопровождающее сообщение TELEX</label>
   <div class="col-md-4">                     
-    <textarea class="form-control" id="textarea" name="textarea" rows="6" cols="60">ТЕКСТ СООБЩЕНИЯ
+    <textarea class="form-control" id="textarea" name="textarea" rows="6" cols="60">
+
+    TEST CODE FROM YOUR MESSAGE WAS SUCCESSFULLY CHECKED    
+
+    
+
 </textarea>
   </div>
 </div>
 
 <!-- Text input-->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="textinput">Дата сделки</label>  
+  <label class="col-md-4 control-label" for="dateinput">Дата сделки</label>  
   <div class="col-md-4">
   <input id="dateinput" name="dateinput" type="text" placeholder="{{ .DateNow }}" value="{{ .DateNow }}" class="form-control input-md" readonly>
   <span class="help-block">Дата сделки</span>  
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="seqcounter">Номер данного сообщения</label>  
+  <div class="col-md-4">
+  <input id="seqcounter" name="seqcounter" type="text" placeholder="" value="{{ .SeqCnt }}" class="form-control input-md" readonly>
+  <span class="help-block">Номер данного сообщения (в году)</span>  
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="telexkey">Ключ TELEX</label>  
+  <div class="col-md-4">
+  <input id="telexkey" name="telexkey" type="text" placeholder="" value="КЛЮЧ НЕ БЫЛ ВЫЧИСЛЕН" class="form-control input-md" readonly>
+  <span class="help-block">Номер данного сообщения (в году)</span>  
+  </div>
+</div>
+
+<!-- Textarea -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="calclog">Рассчет</label>
+  <div class="col-md-4">                     
+    <textarea class="form-control" id="calclog" name="calclog" rows="6" cols="60">
+</textarea>
+  </div>
+</div>
+
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="calcbutton">Рассчитать ключ</label>
+  <div class="col-md-4">
+    	<button id="calcbutton" name="calcbutton" class="btn btn-primary">Рассчитать</button>   
   </div>
 </div>
 
@@ -65,7 +107,7 @@ ul {
 <div class="form-group">
   <label class="col-md-4 control-label" for="savebutton">Сформировать сообщение</label>
   <div class="col-md-4">
-    	<button id="savebutton" name="savebutton" class="btn btn-primary">Сформировать</button>   
+    	<button id="savebutton" name="savebutton" class="btn btn-success">Сформировать</button>   
   </div>
 </div>
 <!-- Button -->
@@ -87,7 +129,7 @@ $('#savebutton').click(function () {
 $('#savebutton').prop('disabled', true);
 var data = $("#register-data").serializeObject();
 data["Post"]="SaveButton"
-alert(JSON.stringify(data));
+//alert(JSON.stringify(data));
 $.ajax({                 /* start ajax function to send data */
         url: "/",
         type: 'POST',
@@ -102,10 +144,15 @@ $.ajax({                 /* start ajax function to send data */
 				alert("Сообщение сформировано успешно.");
 				window.location = '/success';
 			}
-			if (JSON.parse(data) == "SaveNotOk"){
-				alert("Данные введены с ошибкой. Получатель не был добавлен.");
+			if (JSON.parse(data) == "SaveNotOkSUM"){
+				alert("Сумма сделки введена с ошибкой.");
 				$('#savebutton').prop('disabled', false);
 			}
+			if (JSON.parse(data) == "SaveNotOk"){
+				alert("Данные введены с ошибкой.");
+				$('#savebutton').prop('disabled', false);
+			}
+
 						
         }
     }); 
@@ -114,7 +161,7 @@ $('#exitbutton').click(function () {
 $('#exitbutton').prop('disabled', true);
 var data = {};
 data["Post"]="ExitButton"
-alert(JSON.stringify(data));
+//alert(JSON.stringify(data));
 $.ajax({                 /* start ajax function to send data */
         url: "/",
         type: 'POST',
@@ -133,6 +180,38 @@ $.ajax({                 /* start ajax function to send data */
         }
     }); 
 });
+
+$('#calcbutton').click(function () {
+$('#calcbutton').prop('disabled', true);
+var data = $("#register-data").serializeObject();
+data["Post"]="CalcButton"
+//alert(JSON.stringify(data));
+$.ajax({                 /* start ajax function to send data */
+        url: "/",
+        type: 'POST',
+        datatype: 'json',
+        contentType: 'application/json; charset=UTF-8',
+        error: function () { alert("POST Handshake didn't go through") }, /* call disconnect function */
+        data: JSON.stringify(data),
+        success: function (data) {			
+			arr = JSON.parse(data);
+			//alert("Ключ TELEX: "+arr[1]);
+			// handle AJAX redirection
+			if (arr[0] == "CalcOk") {				
+				document.getElementById("telexkey").value = arr[1];
+				document.getElementById("calclog").value = arr[2];
+				
+			}
+			if (JSON.parse(data) == "CalcNotOk"){
+				alert("Данные введены с ошибкой.");
+				$('#calcbutton').prop('disabled', false);
+			}
+
+						
+        }
+    }); 
+});
+
 
 
 $.fn.serializeObject = function()

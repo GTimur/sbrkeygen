@@ -9,7 +9,17 @@ import (
 	"os"
 	"path/filepath"
 	"log"
+	"errors"
 )
+
+type Telex struct {
+	Sum    int
+	Cur    string
+	Msg    string
+	Date   string
+	SeqCnt int
+	Key    string
+}
 
 var (
 	Amount map[int]int
@@ -18,12 +28,45 @@ var (
 	Dispdate map[int]int
 	Seqfrom map[int]int
 	Seqto map[int]int
+	Msg Telex
 
 	CalcLog string          // лог вычисления ключа
-	Seq int                 // номер сообщения в СБЕР в течение года
+	SeqCnt int                 // номер сообщения в СБЕР в течение года
 )
 
-const datapath = "..\\sbrkeygen-data"
+const (
+	datapath = "..\\sbrkeygen-data"
+	seqfile = "seqcount.dat"
+)
+
+func (t *Telex) SetParams(sum int, cur string, msg string, date string, seqcnt int, key string) error {
+	if sum <= 0 {
+		return errors.New("Не указано значение суммы")
+	}
+	t.Sum = sum
+	if len(cur) == 0 {
+		return errors.New("Не указана валюта сделки")
+	}
+	t.Cur = cur
+	if len(msg) == 0 {
+		return errors.New("Не заполнено сопровождающее сообщение к сделке")
+	}
+	t.Msg = msg
+	if len(date) == 0 {
+		return errors.New("Не указана дата сделки")
+	}
+	t.Date = date
+	if seqcnt <= 0 {
+		return errors.New("Не указан номер последовательности для сделки")
+	}
+	t.SeqCnt = seqcnt
+	if len(key) == 0 {
+		return errors.New("Ключ TELEX не может быть пустым")
+	}
+	t.Key = key
+
+	return nil
+}
 
 // Выполняет разложение числа на разряды в массив
 func SplitByAmount(num int) (splitted map[int]int) {
@@ -177,6 +220,8 @@ func CalcCurrency(cur string) int {
 func CalcSeq(seq int, isfrom bool) int {
 	if seq < 0 || seq > 128 {
 		seq = 1
+		SeqCnt = 1
+		UpdateSeqCnt(1)
 	}
 	if !isfrom {
 		CalcLog += "\nSEQUENCE (TO SBER): " + strconv.Itoa(seq) + " ===> " + strconv.Itoa(Seqto[seq])
@@ -292,6 +337,80 @@ func GetDate(shift int) int {
 	return i
 }
 
+// Задает номер счетчика сообщений в файле (перезапишет файл)
+func UpdateSeqCnt(cnt int) (err error) {
+	/* Создадим/перезапишем файл */
+	file, err := os.Create(filepath.Join(datapath, seqfile))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	file.WriteString(strconv.Itoa(cnt))
+
+	return err
+}
+
+
+// Сохраняет сообщение с логом расчета
+func WriteCalcLog() (err error) {
+	/* Создадим/перезапишем файл */
+	prefix := fmt.Sprintf("%03d", SeqCnt)
+	datefix := strings.Replace(Msg.Date, "/", "", -1)
+	file, err := os.Create(filepath.Join(datapath, prefix + "-" + datefix + "-calc.txt"))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(CalcLog)
+	if err != nil {
+		return err
+	}
+
+	/* Если данныые записаны на диск - увеличиваем счетчик */
+
+	return err
+}
+
+// Сохраняет сообщение TELEX
+func WriteTelex() (err error) {
+	/* Создадим/перезапишем файл */
+	prefix := fmt.Sprintf("%03d", SeqCnt)
+	datefix := strings.Replace(Msg.Date, "/", "", -1)
+	file, err := os.Create(filepath.Join(datapath, prefix + "-" + datefix + "-telex.txt"))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	TelexMessage := "UMK BANK\n\n" +
+		"DATE\n" + Msg.Date + "\n\n" +
+		"FREE FORMAT MESSAGE\n\n" +
+		"\t" + Msg.Msg + "\n\n" +
+		"\tTELEX KEY IS " + Msg.Key + "\n\n" +
+		"\tBEST REGARDS,\n" +
+		"\tAO UMK BANK\n" +
+		"\t(861)2100553\n\n" +
+		"END OF MESSAGE\n\n"
+
+	_, err = file.WriteString(TelexMessage)
+	if err != nil {
+		return err
+	}
+
+	err = WriteCalcLog()
+	if err != nil {
+		return err
+	}
+
+	/* Если данныые записаны на диск - увеличиваем счетчик */
+	SeqCnt++
+	UpdateSeqCnt(SeqCnt)
+
+	return err
+}
+
 func InitData() (err error) {
 	Amount, err = ReadAmount(filepath.Join(datapath, "amount.txt"))
 	if err != nil {
@@ -323,14 +442,26 @@ func InitData() (err error) {
 		log.Println("Ошибка чтения файла seqto.txt:", err)
 		return err
 	}
-	Seq, err = ReadSeqCount(filepath.Join(datapath, "seqcount.dat"))
+	SeqCnt, err = ReadSeqCount(filepath.Join(datapath, "seqcount.dat"))
 	if err != nil {
 		log.Println("Ошибка чтения файла seqcount.dat", err)
 		return err
 	}
+	// Зададим номер следующего сообщения
+	SeqCnt += 1;
+	if SeqCnt < 0 || SeqCnt > 128 {
+		SeqCnt = 1
+		UpdateSeqCnt(1)
+	}
+	/*err = UpdateSeqCnt(100)
+	if err != nil {
+		log.Println("Ошибка записи файла seqcount.dat", err)
+		return err
+	}*/
 
 	return err
 }
+
 
 // Вычислет ключ на основе следующих параметров
 // SUM = сумма
@@ -339,7 +470,8 @@ func InitData() (err error) {
 // calshift = сдвиг в днях относительно текущей даты (код по календарю)
 
 func CalcKey(sum int, cur string, seq int, isseqfrom bool, calshift int) (key int) {
-	CalcLog += "\nCURRENCY: " + cur + " ===> " + strconv.Itoa(CalcCurrency(cur))
+	CalcLog = "";
+	CalcLog += "CURRENCY: " + cur + " ===> " + strconv.Itoa(CalcCurrency(cur))
 	key += CalcCurrency(cur)
 	key += CalcAmount(sum) //содержит CalcLog
 	CalcLog += "\nDATE OF DISPATCH: " + strconv.Itoa(GetDate(0)) + " ===> " + strconv.Itoa(Dispdate[GetDate(0)])
@@ -347,5 +479,6 @@ func CalcKey(sum int, cur string, seq int, isseqfrom bool, calshift int) (key in
 	key += CalcSeq(seq, isseqfrom)
 	CalcLog += "\nFIXED NUMBER: " + strconv.Itoa(Fixed["FIXED"])
 	key += Fixed["FIXED"]
+	CalcLog += "\n";
 	return key
 }

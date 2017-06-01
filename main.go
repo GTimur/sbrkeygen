@@ -13,7 +13,7 @@ import (
 
 func main() {
 	// Баннер
-	fmt.Println("SBERBANK TELEX KEY GENERATOR (C) 2017 ver.0.1")
+	fmt.Println("SBERBANK TELEX KEY GENERATOR (C) 2017 ver.0.3")
 	err := keygen.InitData()
 	if err != nil {
 		log.Fatal("Ошибка инициализации. Возникла проблема с одним из файлов данных:", err)
@@ -49,7 +49,7 @@ func main() {
 		}
 	}()
 
-	fmt.Println("TELEX KEY IS", keygen.CalcKey(34321, "RUB", keygen.Seq, false, 0))
+	fmt.Println("TELEX KEY IS", keygen.CalcKey(34321, "RUB", keygen.SeqCnt, false, 0))
 	fmt.Printf("%s", keygen.CalcLog)
 
 	//	reader := bufio.NewReader(os.Stdin)

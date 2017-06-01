@@ -34,6 +34,7 @@ type Page struct {
 	Body    template.HTML
 	LnkHome string
 	DateNow template.HTML
+	SeqCnt  int
 }
 
 
@@ -71,7 +72,7 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 	//page := Page{title, template.HTML(body), lnkhome, "" }
 	now := time.Now()
 	datenow := now.Format("02/01/2006")
-	page := Page{title, template.HTML(body), lnkhome, template.HTML(datenow)}
+	page := Page{title, template.HTML(body), lnkhome, template.HTML(datenow), SeqCnt}
 
 	if r.Method == "GET" {
 		if err := home_template.ExecuteTemplate(w, "main", page); err != nil {
@@ -98,8 +99,55 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 		enc := json.NewEncoder(w)
 		switch jh["Post"] {
 		case "SaveButton":
-			fmt.Println("SaveButton pressed")
+			sum, err := strconv.Atoi(jh["suminput"])
+			if err != nil {
+				enc.Encode("SaveNotOkSUM")
+				break
+			}
+			cnt, err := strconv.Atoi(jh["seqcounter"])
+			if err != nil {
+				enc.Encode("SaveNotOkSUM")
+				break
+			}
+			key := CalcKey(sum, jh["selectcur"], SeqCnt, false, 0)
+			prefix := fmt.Sprintf("%03d", SeqCnt)
+			telexkey := prefix + strconv.Itoa(key)
+
+			err = Msg.SetParams(sum, jh["selectcur"], jh["textarea"], jh["dateinput"], cnt, telexkey)
+			if err != nil {
+				enc.Encode("Ошибка: " + err.Error())
+				break
+			}
+			err = WriteTelex()
+			if err != nil {
+				enc.Encode("Ошибка создания файла сообщения: " + err.Error())
+				break
+			}
 			enc.Encode("SaveOk")
+
+		case "CalcButton":
+			sum, err := strconv.Atoi(jh["suminput"])
+			if err != nil {
+				enc.Encode("CalcNotOk")
+				break
+			}
+			cnt, err := strconv.Atoi(jh["seqcounter"])
+			if err != nil {
+				enc.Encode("SaveNotOkSUM")
+				break
+			}
+
+			key := CalcKey(sum, jh["selectcur"], SeqCnt, false, 0)
+			prefix := fmt.Sprintf("%03d", SeqCnt)
+			telexkey := prefix + strconv.Itoa(key)
+
+			err = Msg.SetParams(sum, jh["selectcur"], jh["textarea"], jh["dateinput"], cnt, telexkey)
+			if err != nil {
+				enc.Encode("Ошибка: " + err.Error())
+				break
+			}
+
+			enc.Encode([]string{"CalcOk", telexkey, CalcLog})
 		case "ExitButton":
 			enc.Encode("ExitOk")
 			WaitExit = true
