@@ -17,8 +17,8 @@ ul {
 </div>
 <!-- Text input-->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="suminput">Укажите сумму сделки</label>  
-  <div class="col-md-4">	
+  <label class="col-md-2 control-label" for="suminput">Укажите сумму сделки</label>  
+  <div class="col-md-8">	
 	<div class="input-group">	  
 	  <span class="input-group-addon">Руб</span>
 	  <input type="text" class="form-control" aria-label="Окргулено до рубля" id="suminput" name="suminput" type="text" placeholder="0">
@@ -31,7 +31,7 @@ ul {
 
 <!-- Select Basic -->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="selectcur">Валюта</label>
+  <label class="col-md-2 control-label" for="selectcur">Валюта</label>
   <div class="col-md-2">
     <select id="selectcur" name="selectcur" class="form-control">
     <option value="RUB">RUB</option>
@@ -46,9 +46,9 @@ ul {
 
 <!-- Textarea -->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="textarea">Сопровождающее сообщение TELEX</label>
-  <div class="col-md-4">                     
-    <textarea class="form-control" id="textarea" name="textarea" rows="20" cols="60">
+  <label class="col-md-2 control-label" for="textarea">Сопровождающее сообщение TELEX</label>
+  <div class="col-md-8">                     
+    <textarea class="form-control" id="textarea" name="textarea" rows="20" cols="80">
 	PODTVERJDENIE PO SDELKE MBK
 
 	g. Krasnodar 05 iunya 2017
@@ -87,8 +87,8 @@ ul {
 
 <!-- Text input-->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="dateinput">Дата сделки</label>  
-  <div class="col-md-4">
+  <label class="col-md-2 control-label" for="dateinput">Дата сделки</label>  
+  <div class="col-md-8">
   <input id="dateinput" name="dateinput" type="text" placeholder="{{ .DateNow }}" value="{{ .DateNow }}" class="form-control input-md" readonly>
   <span class="help-block">Дата сделки</span>  
   </div>
@@ -96,8 +96,8 @@ ul {
 
 <!-- Text input-->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="seqcounter">Номер данного сообщения</label>  
-  <div class="col-md-4">
+  <label class="col-md-2 control-label" for="seqcounter">Номер данного сообщения</label>  
+  <div class="col-md-8">
   <input id="seqcounter" name="seqcounter" type="text" placeholder="" value="{{ .SeqCnt }}" class="form-control input-md" readonly>
   <span class="help-block">Номер данного сообщения (в году)</span>  
   </div>
@@ -105,8 +105,8 @@ ul {
 
 <!-- Text input-->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="telexkey">Ключ TELEX</label>  
-  <div class="col-md-4">
+  <label class="col-md-2 control-label" for="telexkey">Ключ TELEX</label>  
+  <div class="col-md-8">
   <input id="telexkey" name="telexkey" type="text" placeholder="" value="КЛЮЧ НЕ БЫЛ ВЫЧИСЛЕН" class="form-control input-md" readonly>
   <span class="help-block">Номер данного сообщения (в году)</span>  
   </div>
@@ -114,8 +114,8 @@ ul {
 
 <!-- Textarea -->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="calclog">Рассчет</label>
-  <div class="col-md-4">                     
+  <label class="col-md-2 control-label" for="calclog">Рассчет</label>
+  <div class="col-md-8">                     
     <textarea class="form-control" id="calclog" name="calclog" rows="6" cols="60">
 </textarea>
   </div>
@@ -124,7 +124,7 @@ ul {
 
 <!-- Button -->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="calcbutton">Рассчитать ключ</label>
+  <label class="col-md-2 control-label" for="calcbutton">Рассчитать ключ</label>
   <div class="col-md-4">
     	<button id="calcbutton" name="calcbutton" class="btn btn-primary">Рассчитать</button>   
   </div>
@@ -132,14 +132,14 @@ ul {
 
 <!-- Button -->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="savebutton">Сформировать сообщение</label>
+  <label class="col-md-2 control-label" for="savebutton">Сформировать сообщение</label>
   <div class="col-md-4">
     	<button id="savebutton" name="savebutton" class="btn btn-success">Сформировать</button>   
   </div>
 </div>
 <!-- Button -->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="exitbutton">Завершение приложения</label>
+  <label class="col-md-2 control-label" for="exitbutton">Завершение приложения</label>
   <div class="col-md-4">
 	<button id="exitbutton" name="exitbutton" class="btn btn-danger">Выход</button>    
   </div>
