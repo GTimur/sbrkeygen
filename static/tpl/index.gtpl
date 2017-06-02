@@ -9,7 +9,7 @@ ul {
 {{define "title"}}{{.Title}} {{end}}
 {{define "body"}}
 {{.Body}}
-<form class="form-horizontal" id="register-data" action="/" method="post">
+<form class="form-horizontal" id="register-data" action="javascript:void(null);" method="post">
 <fieldset>
 <div class="jumbotron text-center">
   <h1>SBERBANK TELEX KEY GENERATOR</h1>

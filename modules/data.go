@@ -13,7 +13,7 @@ import (
 )
 
 type Telex struct {
-	Sum    int
+	Sum    int64
 	Cur    string
 	Msg    string
 	Date   string
@@ -22,12 +22,12 @@ type Telex struct {
 }
 
 var (
-	Amount map[int]int
+	Amount map[int64]int
 	Currency map[string]int
 	Fixed map[string]int
-	Dispdate map[int]int
-	Seqfrom map[int]int
-	Seqto map[int]int
+	Dispdate map[int64]int
+	Seqfrom map[int64]int
+	Seqto map[int64]int
 	Msg Telex
 
 	CalcLog string          // лог вычисления ключа
@@ -39,7 +39,7 @@ const (
 	seqfile = "seqcount.dat"
 )
 
-func (t *Telex) SetParams(sum int, cur string, msg string, date string, seqcnt int, key string) error {
+func (t *Telex) SetParams(sum int64, cur string, msg string, date string, seqcnt int, key string) error {
 	if sum <= 0 {
 		return errors.New("Не указано значение суммы")
 	}
@@ -69,20 +69,20 @@ func (t *Telex) SetParams(sum int, cur string, msg string, date string, seqcnt i
 }
 
 // Выполняет разложение числа на разряды в массив
-func SplitByAmount(num int) (splitted map[int]int) {
+func SplitByAmount(num int64) (splitted map[int64]int64) {
 	// Amount: 1 10 100 1000 10000 100000 1000000 10000000 100000000 1000000000 10000000000
-	var amtlist = make(map[int]int)
+	var amtlist = make(map[int64]int64)
 
 	amtlist [0] = 0
 	amtlist [10000000000] = 0
 
-	for i := 1; i <= 10000000000; i *= 10 {
+	for i := int64(1); i <= 10000000000; i *= 10 {
 		amtlist[i] = 0
 	}
 
 	//fmt.Println(amtlist)
 
-	for i := 10000000000; i != 0 && num != 0; i /= 10 {
+	for i := int64(10000000000); i != 0 && num != 0; i /= 10 {
 		//fmt.Println("NUM:", num, " ", i, " ", num / i)
 		if num / i == 0 {
 			continue
@@ -102,7 +102,7 @@ func SplitByAmount(num int) (splitted map[int]int) {
 }
 
 // Считываем AMOUNT значения из файла
-func ReadAmount(filename string) (amount map[int]int, err error) {
+func ReadAmount(filename string) (amount map[int64]int, err error) {
 	// Open the file.
 	f, err := os.Open(filename)
 	if err != nil {
@@ -110,26 +110,26 @@ func ReadAmount(filename string) (amount map[int]int, err error) {
 	}
 	// Create a new Scanner for the file.
 	scanner := bufio.NewScanner(f)
-	amount = make(map[int]int)
+	amount = make(map[int64]int)
 	// Loop over all lines in the file and print them.
 	for scanner.Scan() {
 		line := scanner.Text()
 		str := strings.Split(line, "\t")
-		k, err := strconv.Atoi(str[0])
+		k, err := strconv.ParseInt(str[0], 10, 64)//strconv.Atoi(str[0])
 		if err != nil {
 			return amount, err
 		}
-		v, err := strconv.Atoi(str[1])
+		v, err := strconv.ParseInt(str[1], 10, 64)//strconv.Atoi(str[1])
 		if err != nil {
 			return amount, err
 		}
-		amount[k] = v
+		amount[int64(k)] = int(v)
 	}
 	return amount, err
 }
 
 // Расчет суммы AMOUNT с учетом таблицы разбивки по раздрядам (amount.txt)
-func CalcAmount(sum int) int {
+func CalcAmount(sum int64) int {
 	// Amount: 1 10 100 1000 10000 100000 1000000 10000000 100000000 1000000000 10000000000
 	splitted := SplitByAmount(sum)
 	//fmt.Println(splitted)
@@ -137,13 +137,13 @@ func CalcAmount(sum int) int {
 	if sum >= 100000000000 {
 		res := Amount[100000000000]
 		CalcLog += "\nAMOUNT: " + strconv.Itoa(res)
-		CalcLog += "\n" + strconv.Itoa(sum) + ">=100000000000 ===> " + strconv.Itoa(Amount[100000000000])
+		CalcLog += "\n" + strconv.FormatInt(sum,10) + ">=100000000000 ===> " + strconv.Itoa(Amount[100000000000])
 		return res
 	}
 	if sum == 0 {
 		res := Amount[0]
 		CalcLog += "\nAMOUNT: " + strconv.Itoa(res)
-		CalcLog += "\n" + strconv.Itoa(sum) + "=0 ===> " + strconv.Itoa(Amount[0])
+		CalcLog += "\n" +strconv.FormatInt(sum,10) + "=0 ===> " + strconv.Itoa(Amount[0])
 		return res
 	}
 
@@ -152,7 +152,7 @@ func CalcAmount(sum int) int {
 		if v == 0 {
 			continue
 		}
-		log += "\n" + strconv.Itoa(sum) + "=" + strconv.Itoa(v) + "*" + strconv.Itoa(k) + " ===> " + strconv.Itoa(Amount[k + v])
+		log += "\n" + strconv.FormatInt(sum,10) + "=" + strconv.FormatInt(v,10) + "*" + strconv.FormatInt(k,10) + " ===> " + strconv.Itoa(Amount[k + v])
 		if k == 1 && v == 1 {
 			v -= 1
 		}
@@ -224,17 +224,17 @@ func CalcSeq(seq int, isfrom bool) int {
 		UpdateSeqCnt(1)
 	}
 	if !isfrom {
-		CalcLog += "\nSEQUENCE (TO SBER): " + strconv.Itoa(seq) + " ===> " + strconv.Itoa(Seqto[seq])
-		return Seqto[seq]
+		CalcLog += "\nSEQUENCE (TO SBER): " + strconv.Itoa(seq) + " ===> " + strconv.Itoa(Seqto[int64(seq)])
+		return Seqto[int64(seq)]
 	}
-	CalcLog += "\nSEQUENCE (FROM SBER): " + strconv.Itoa(seq) + " ===> " + strconv.Itoa(Seqfrom[seq])
-	return Seqfrom[seq]
+	CalcLog += "\nSEQUENCE (FROM SBER): " + strconv.Itoa(seq) + " ===> " + strconv.Itoa(Seqfrom[int64(seq)])
+	return Seqfrom[int64(seq)]
 
 }
 
 
 // Считываем calendar.txt значения из файла
-func ReadDispDate(filename string) (dispdate map[int]int, err error) {
+func ReadDispDate(filename string) (dispdate map[int64]int, err error) {
 	// Open the file.
 	f, err := os.Open(filename)
 	if err != nil {
@@ -242,7 +242,7 @@ func ReadDispDate(filename string) (dispdate map[int]int, err error) {
 	}
 	// Create a new Scanner for the file.
 	scanner := bufio.NewScanner(f)
-	dispdate = make(map[int]int)
+	dispdate = make(map[int64]int)
 	// Loop over all lines in the file and print them.
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -260,14 +260,14 @@ func ReadDispDate(filename string) (dispdate map[int]int, err error) {
 			return dispdate, err
 		}
 
-		dispdate[k1 * 100 + k2] = v
+		dispdate[int64(k1 * 100 + k2)] = v
 	}
 	return dispdate, err
 }
 
 // Считываем SEQUENCE number либо из from.txt либо из to.txt
 // заивсит от флага isfrom
-func ReadFromTo(from string, to string, isfrom bool) (res map[int]int, err error) {
+func ReadFromTo(from string, to string, isfrom bool) (res map[int64]int, err error) {
 	filename := from
 	if !isfrom {
 		filename = to
@@ -279,7 +279,7 @@ func ReadFromTo(from string, to string, isfrom bool) (res map[int]int, err error
 	}
 	// Create a new Scanner for the file.
 	scanner := bufio.NewScanner(f)
-	res = make(map[int]int)
+	res = make(map[int64]int)
 	// Loop over all lines in the file and print them.
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -292,7 +292,7 @@ func ReadFromTo(from string, to string, isfrom bool) (res map[int]int, err error
 		if err != nil {
 			return res, err
 		}
-		res[k] = v
+		res[int64(k)] = v
 	}
 	return res, err
 }
@@ -469,13 +469,13 @@ func InitData() (err error) {
 // SEQ = номер по порядку сообщения
 // calshift = сдвиг в днях относительно текущей даты (код по календарю)
 
-func CalcKey(sum int, cur string, seq int, isseqfrom bool, calshift int) (key int) {
+func CalcKey(sum int64, cur string, seq int, isseqfrom bool, calshift int) (key int) {
 	CalcLog = "";
 	CalcLog += "CURRENCY: " + cur + " ===> " + strconv.Itoa(CalcCurrency(cur))
 	key += CalcCurrency(cur)
 	key += CalcAmount(sum) //содержит CalcLog
-	CalcLog += "\nDATE OF DISPATCH: " + strconv.Itoa(GetDate(0)) + " ===> " + strconv.Itoa(Dispdate[GetDate(0)])
-	key += Dispdate[GetDate(0)]
+	CalcLog += "\nDATE OF DISPATCH: " + strconv.Itoa(GetDate(0)) + " ===> " + strconv.Itoa(Dispdate[int64(GetDate(0))])
+	key += Dispdate[int64(GetDate(0))]
 	key += CalcSeq(seq, isseqfrom)
 	CalcLog += "\nFIXED NUMBER: " + strconv.Itoa(Fixed["FIXED"])
 	key += Fixed["FIXED"]

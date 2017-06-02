@@ -13,7 +13,7 @@ import (
 
 func main() {
 	// Баннер
-	fmt.Println("SBERBANK TELEX KEY GENERATOR (C) 2017 ver.0.4")
+	fmt.Println("SBERBANK TELEX KEY GENERATOR (C) 2017 ver.0.5")
 	err := keygen.InitData()
 	if err != nil {
 		log.Fatal("Ошибка инициализации. Возникла проблема с одним из файлов данных:", err)
@@ -45,9 +45,11 @@ func main() {
 	go func() {
 		for sig := range c {
 			fmt.Printf("\nReceived %v, shutdown procedure initiated.\n\n", sig)
+			keygen.Quit <- 1
 			keygen.WaitExit = true
 		}
 	}()
+
 
 	//fmt.Println("TELEX KEY IS", keygen.CalcKey(34321, "RUB", keygen.SeqCnt, false, 0))
 	//fmt.Printf("%s", keygen.CalcLog)

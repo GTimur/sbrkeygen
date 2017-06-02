@@ -3,7 +3,7 @@ package keygen
 import (
 	"log"
 	"net/http"
-	"github.com/braintree/manners"
+	//	"github.com/braintree/manners"
 	"net"
 	"fmt"
 	"strconv"
@@ -11,6 +11,7 @@ import (
 	"html/template"
 	"time"
 	"encoding/json"
+	"context"
 )
 
 type WebCtl struct {
@@ -38,27 +39,42 @@ type Page struct {
 }
 
 
-//Глобальная переменная для хранения настроек
+
 var (
-	GlobalConfig Config = Config{}
+	GlobalConfig Config = Config{} //Глобальная переменная для хранения настроек
 	home_template = template.Must(template.ParseFiles(path.Join("static", "tpl", "main.gtpl"), path.Join("static", "tpl", "index.gtpl")))
 	WaitExit bool
+	Quit = make(chan int,1 )  //канал для завершения сервера HTTP
+
 )
 
 /*Сервер*/
 //Запускает goroutine ListenAndServe
 //Может изменять accbook - справочник подписантов
 func (w *WebCtl) StartServe() (err error) {
-	// для отдачи сервером статичных файлов из папки public/static
+	//signal.Notify(Quit, os.Interrupt)
+	srv := &http.Server{Addr : w.connString(), Handler: http.DefaultServeMux}
 
+	// для отдачи сервером статичных файлов из папки public/static
 	fs := http.FileServer(http.Dir("./static/"))
 	//http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	cssFileServer := http.StripPrefix("/static/", fs)
 	http.Handle("/static/", cssFileServer)
 	http.HandleFunc("/", urlhome) //Страница управления
+
 	go func() {
-		log.Fatalln("WebCtl:", manners.ListenAndServe(w.connString(), http.DefaultServeMux))
+		log.Println("Starting HTTP-server...")
+		log.Fatalln("WebCtl:", srv.ListenAndServe())
+	}()
+
+	go func() {
+		<-Quit
+		fmt.Println("Shutting down HTTP-server...")
+		ctx, _ := context.WithTimeout(context.Background(), 1 * time.Second)
+		if err := srv.Shutdown(ctx); err != nil {
+			log.Fatalln("HTTP Shutdown error:", err)
+		}
 	}()
 	w.islisten = true
 	return err
@@ -94,6 +110,8 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 			log.Println("Handshake error: ", err)
 		}
 
+		fmt.Println(jh)
+
 		enc := json.NewEncoder(w)
 		switch jh["Post"] {
 		case "SaveButton":
@@ -107,11 +125,11 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 				enc.Encode("SaveNotOk")
 				break
 			}
-			key := CalcKey(sum, jh["selectcur"], SeqCnt, false, 0)
+			key := CalcKey(int64(sum), jh["selectcur"], SeqCnt, false, 0)
 			prefix := fmt.Sprintf("%03d", SeqCnt)
 			telexkey := prefix + strconv.Itoa(key)
 
-			err = Msg.SetParams(sum, jh["selectcur"], jh["textarea"], jh["dateinput"], cnt, telexkey)
+			err = Msg.SetParams(int64(sum), jh["selectcur"], jh["textarea"], jh["dateinput"], cnt, telexkey)
 			if err != nil {
 				enc.Encode("Ошибка: " + err.Error())
 				break
@@ -136,11 +154,11 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 
-			key := CalcKey(sum, jh["selectcur"], SeqCnt, false, 0)
+			key := CalcKey(int64(sum), jh["selectcur"], SeqCnt, false, 0)
 			prefix := fmt.Sprintf("%03d", SeqCnt)
 			telexkey := prefix + strconv.Itoa(key)
 
-			err = Msg.SetParams(sum, jh["selectcur"], jh["textarea"], jh["dateinput"], cnt, telexkey)
+			err = Msg.SetParams(int64(sum), jh["selectcur"], jh["textarea"], jh["dateinput"], cnt, telexkey)
 			if err != nil {
 				enc.Encode("Ошибка: " + err.Error())
 				break
