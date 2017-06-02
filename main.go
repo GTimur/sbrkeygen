@@ -1,3 +1,4 @@
+//go:generate goversioninfo -icon=icon.ico
 package main
 
 import (
@@ -13,7 +14,7 @@ import (
 
 func main() {
 	// Баннер
-	fmt.Println("SBERBANK TELEX KEY GENERATOR (C) 2017 ver.0.5")
+	fmt.Println("SBERBANK TELEX KEY GENERATOR (C) 2017 ver.0.6")
 	err := keygen.InitData()
 	if err != nil {
 		log.Fatal("Ошибка инициализации. Возникла проблема с одним из файлов данных:", err)

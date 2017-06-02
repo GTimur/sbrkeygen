@@ -35,8 +35,10 @@ var (
 )
 
 const (
-	datapath = "..\\sbrkeygen-data"
+	datapath = "..\\sbrkeygen-data\\system"
 	seqfile = "seqcount.dat"
+	logpath = "..\\sbrkeygen-data\\log"
+	telexpath = "..\\sbrkeygen-data\\telex"
 )
 
 func (t *Telex) SetParams(sum int64, cur string, msg string, date string, seqcnt int, key string) error {
@@ -137,13 +139,13 @@ func CalcAmount(sum int64) int {
 	if sum >= 100000000000 {
 		res := Amount[100000000000]
 		CalcLog += "\nAMOUNT: " + strconv.Itoa(res)
-		CalcLog += "\n" + strconv.FormatInt(sum,10) + ">=100000000000 ===> " + strconv.Itoa(Amount[100000000000])
+		CalcLog += "\n" + strconv.FormatInt(sum, 10) + ">=100000000000 ===> " + strconv.Itoa(Amount[100000000000])
 		return res
 	}
 	if sum == 0 {
 		res := Amount[0]
 		CalcLog += "\nAMOUNT: " + strconv.Itoa(res)
-		CalcLog += "\n" +strconv.FormatInt(sum,10) + "=0 ===> " + strconv.Itoa(Amount[0])
+		CalcLog += "\n" + strconv.FormatInt(sum, 10) + "=0 ===> " + strconv.Itoa(Amount[0])
 		return res
 	}
 
@@ -152,7 +154,7 @@ func CalcAmount(sum int64) int {
 		if v == 0 {
 			continue
 		}
-		log += "\n" + strconv.FormatInt(sum,10) + "=" + strconv.FormatInt(v,10) + "*" + strconv.FormatInt(k,10) + " ===> " + strconv.Itoa(Amount[k + v])
+		log += "\n" + strconv.FormatInt(sum, 10) + "=" + strconv.FormatInt(v, 10) + "*" + strconv.FormatInt(k, 10) + " ===> " + strconv.Itoa(Amount[k + v])
 		if k == 1 && v == 1 {
 			v -= 1
 		}
@@ -356,8 +358,9 @@ func UpdateSeqCnt(cnt int) (err error) {
 func WriteCalcLog() (err error) {
 	/* Создадим/перезапишем файл */
 	prefix := fmt.Sprintf("%03d", SeqCnt)
-	datefix := strings.Replace(Msg.Date, "/", "", -1)
-	file, err := os.Create(filepath.Join(datapath, prefix + "-" + datefix + "-calc.txt"))
+	now := time.Now()
+	datefix := strings.Replace(Msg.Date, "/", "", -1)+fmt.Sprintf("%02d%02d", now.Hour(), now.Second())
+	file, err := os.Create(filepath.Join(logpath, prefix + "-" + datefix + "-calc.txt"))
 	if err != nil {
 		return err
 	}
@@ -377,8 +380,10 @@ func WriteCalcLog() (err error) {
 func WriteTelex() (err error) {
 	/* Создадим/перезапишем файл */
 	prefix := fmt.Sprintf("%03d", SeqCnt)
-	datefix := strings.Replace(Msg.Date, "/", "", -1)
-	file, err := os.Create(filepath.Join(datapath, prefix + "-" + datefix + "-telex.txt"))
+	now := time.Now()
+	datefix := strings.Replace(Msg.Date, "/", "", -1)+fmt.Sprintf("%02d%02d", now.Hour(), now.Second())
+
+	file, err := os.Create(filepath.Join(telexpath, prefix + "-" + datefix + "-telex.txt"))
 	if err != nil {
 		return err
 	}
@@ -387,7 +392,7 @@ func WriteTelex() (err error) {
 	TelexMessage := "UMK BANK\n\n" +
 		"DATE\n" + Msg.Date + "\n\n" +
 		"FREE FORMAT MESSAGE\n\n" +
-		"\t" + Msg.Msg + "\n\n" +
+		Msg.Msg + "\n\n" +
 		"\tTELEX KEY IS " + Msg.Key + "\n\n" +
 		"\tBEST REGARDS,\n" +
 		"\tAO UMK BANK\n" +
@@ -405,8 +410,8 @@ func WriteTelex() (err error) {
 	}
 
 	/* Если данныые записаны на диск - увеличиваем счетчик */
-	SeqCnt++
 	UpdateSeqCnt(SeqCnt)
+	SeqCnt++
 
 	return err
 }

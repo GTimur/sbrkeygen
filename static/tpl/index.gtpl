@@ -49,11 +49,38 @@ ul {
   <label class="col-md-4 control-label" for="textarea">Сопровождающее сообщение TELEX</label>
   <div class="col-md-4">                     
     <textarea class="form-control" id="textarea" name="textarea" rows="6" cols="60">
+	PODTVERJDENIE PO SDELKE MBK
 
-    TEST CODE FROM YOUR MESSAGE WAS SUCCESSFULLY CHECKED    
+	g. Krasnodar 05 iunya 2017
 
-    
+	Naimenovanie kontragenta: PAO Sberbank Rossii
+	-nomer sdelki: 240106
+	-sdelka: mi razmeshyaem
+	-naimenovanie valuti: rub
+	-summa sdelki : 500 000 000  (pyatsot millionov) RUB
+	-procentnaya Stavka po kreditu 8.1 %  godovix
+	-summa procentov: 110 958 (sto desyat tisyach devyatsot pyatdesyat vosem) rub 90 kopeek
+	-data valutirobaniya: 05 iunya 2017 
+	-data vozvrata: 06 iunya 2017
+	-period sdelki : 1 den	
 
+	Rekviziti  CJSC "Sberbank po sdelke MBK:
+
+	Naimenovanie platelsheka: CJSC "Sberbank 
+	Schet platelshika: 30301810000006000014  
+	Korrespondenskii schet : 30101810400000000225
+	BIC 044525225, 
+	INN 7707083893
+
+	Rekviziti dlya vozvrata:
+
+	Naimenovanie poluchatelyz: AO UMK bank
+	Schet poluchatelya osnovnogo dolga: 32002810600000102769 
+	Korrespondenskii schet - 30101810600000000830 v GRKC g. Krasnodar GY Banka Rossii po Krasnodarskomy krau, BIC 040349830, 
+	INN/KPP 2310138789/231201001
+
+	Schet poluchatelya procentov: 47427810600000002769 Korrespondenskii schet  30101810600000000830 30101810600000000830 v GRKC g. Krasnodar GY Banka Rossii po Krasnodarskomy krau, BIC 040349830, 
+	INN/KPP 2310138789/231201001  
 </textarea>
   </div>
 </div>
