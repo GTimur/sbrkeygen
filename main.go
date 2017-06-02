@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// Баннер
-	fmt.Println("SBERBANK TELEX KEY GENERATOR (C) 2017 ver.0.6")
+	fmt.Println("SBERBANK TELEX KEY GENERATOR (C) 2017 ver.0.61")
 	err := keygen.InitData()
 	if err != nil {
 		log.Fatal("Ошибка инициализации. Возникла проблема с одним из файлов данных:", err)

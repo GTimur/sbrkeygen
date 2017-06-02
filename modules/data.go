@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"log"
 	"errors"
+	"os/user"
 )
 
 type Telex struct {
@@ -32,6 +33,8 @@ var (
 
 	CalcLog string          // лог вычисления ключа
 	SeqCnt int                 // номер сообщения в СБЕР в течение года
+	copytelexpath string    // файли логов и
+	copylogpath string      // телекса копируются в папку пользователя
 )
 
 const (
@@ -359,7 +362,7 @@ func WriteCalcLog() (err error) {
 	/* Создадим/перезапишем файл */
 	prefix := fmt.Sprintf("%03d", SeqCnt)
 	now := time.Now()
-	datefix := strings.Replace(Msg.Date, "/", "", -1)+fmt.Sprintf("%02d%02d", now.Hour(), now.Second())
+	datefix := strings.Replace(Msg.Date, "/", "", -1) + fmt.Sprintf("%02d%02d", now.Hour(), now.Second())
 	file, err := os.Create(filepath.Join(logpath, prefix + "-" + datefix + "-calc.txt"))
 	if err != nil {
 		return err
@@ -370,6 +373,17 @@ func WriteCalcLog() (err error) {
 	if err != nil {
 		return err
 	}
+	filecopy, err := os.Create(filepath.Join(copylogpath, prefix + "-" + datefix + "-calc.txt"))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = filecopy.WriteString(CalcLog)
+	if err != nil {
+		return err
+	}
+
 
 	/* Если данныые записаны на диск - увеличиваем счетчик */
 
@@ -381,7 +395,7 @@ func WriteTelex() (err error) {
 	/* Создадим/перезапишем файл */
 	prefix := fmt.Sprintf("%03d", SeqCnt)
 	now := time.Now()
-	datefix := strings.Replace(Msg.Date, "/", "", -1)+fmt.Sprintf("%02d%02d", now.Hour(), now.Second())
+	datefix := strings.Replace(Msg.Date, "/", "", -1) + fmt.Sprintf("%02d%02d", now.Hour(), now.Second())
 
 	file, err := os.Create(filepath.Join(telexpath, prefix + "-" + datefix + "-telex.txt"))
 	if err != nil {
@@ -403,6 +417,19 @@ func WriteTelex() (err error) {
 	if err != nil {
 		return err
 	}
+
+	/**MAKE FILE COPY**/
+	filecopy, err := os.Create(filepath.Join(copytelexpath, prefix + "-" + datefix + "-telex.txt"))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = filecopy.WriteString(TelexMessage)
+	if err != nil {
+		return err
+	}
+	/*****/
 
 	err = WriteCalcLog()
 	if err != nil {
@@ -452,6 +479,24 @@ func InitData() (err error) {
 		log.Println("Ошибка чтения файла seqcount.dat", err)
 		return err
 	}
+
+	userhome, err := GetUserHome()
+	if err != nil {
+		log.Println("Ошибка чтения домашнего каталога пользователя:", err)
+		return err
+	}
+
+
+	copylogpath = filepath.Join(userhome, "DOCUMENTS", "TELEXGEN", "LOG")
+	copytelexpath = filepath.Join(userhome, "DOCUMENTS", "TELEXGEN", "TELEX")
+	if _, err := os.Stat(copylogpath); os.IsNotExist(err) {
+		os.MkdirAll(copylogpath,0777);
+	}
+
+	if _, err := os.Stat(copytelexpath); os.IsNotExist(err) {
+		os.MkdirAll(copytelexpath,0777);
+	}
+
 	// Зададим номер следующего сообщения
 	SeqCnt += 1;
 	if SeqCnt <= 0 || SeqCnt > 128 {
@@ -467,6 +512,13 @@ func InitData() (err error) {
 	return err
 }
 
+func GetUserHome() (string, error) {
+	usr, err := user.Current()
+	if err != nil {
+		return "", err
+	}
+	return usr.HomeDir, err
+}
 
 // Вычислет ключ на основе следующих параметров
 // SUM = сумма
