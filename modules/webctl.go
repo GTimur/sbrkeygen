@@ -82,7 +82,7 @@ func (w *WebCtl) StartServe() (err error) {
 
 //Обработчик запросов для home
 func urlhome(w http.ResponseWriter, r *http.Request) {
-	title := "COURIER GO"
+	title := "TELEXGEN GO"
 	body := ""
 	lnkhome := "http://" + GlobalConfig.managerSrv.Addr + ":" + strconv.Itoa(int(GlobalConfig.managerSrv.Port))
 	//page := Page{title, template.HTML(body), lnkhome, "" }
