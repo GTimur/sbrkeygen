@@ -48,7 +48,7 @@ ul {
 <div class="form-group">
   <label class="col-md-4 control-label" for="textarea">Сопровождающее сообщение TELEX</label>
   <div class="col-md-4">                     
-    <textarea class="form-control" id="textarea" name="textarea" rows="6" cols="60">
+    <textarea class="form-control" id="textarea" name="textarea" rows="20" cols="60">
 	PODTVERJDENIE PO SDELKE MBK
 
 	g. Krasnodar 05 iunya 2017
