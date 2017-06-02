@@ -110,8 +110,6 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 			log.Println("Handshake error: ", err)
 		}
 
-		fmt.Println(jh)
-
 		enc := json.NewEncoder(w)
 		switch jh["Post"] {
 		case "SaveButton":

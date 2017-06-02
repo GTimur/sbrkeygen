@@ -373,16 +373,19 @@ func WriteCalcLog() (err error) {
 	if err != nil {
 		return err
 	}
+
+	/**MAKE COPY**/
 	filecopy, err := os.Create(filepath.Join(copylogpath, prefix + "-" + datefix + "-calc.txt"))
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer filecopy.Close()
 
 	_, err = filecopy.WriteString(CalcLog)
 	if err != nil {
 		return err
 	}
+	/******/
 
 
 	/* Если данныые записаны на диск - увеличиваем счетчик */
@@ -423,7 +426,7 @@ func WriteTelex() (err error) {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer filecopy.Close()
 
 	_, err = filecopy.WriteString(TelexMessage)
 	if err != nil {
