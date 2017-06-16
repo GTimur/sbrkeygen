@@ -45,7 +45,7 @@ const (
 )
 
 func (t *Telex) SetParams(sum int64, cur string, msg string, date string, seqcnt int, key string) error {
-	if sum <= 0 {
+	if sum < 0 {
 		return errors.New("Не указано значение суммы")
 	}
 	t.Sum = sum
@@ -74,25 +74,25 @@ func (t *Telex) SetParams(sum int64, cur string, msg string, date string, seqcnt
 }
 
 // Выполняет разложение числа на разряды в массив
-func SplitByAmount(num int64) (splitted map[int64]int64) {
+func SplitByAmount(num int64) (splitted map[int64]int) {
 	// Amount: 1 10 100 1000 10000 100000 1000000 10000000 100000000 1000000000 10000000000
-	var amtlist = make(map[int64]int64)
+	var amtlist = make(map[int64]int)
 
-	amtlist [0] = 0
-	amtlist [10000000000] = 0
+	amtlist [0] = Amount[0]
+	amtlist [100000000000] = Amount[100000000000]
 
-	for i := int64(1); i <= 10000000000; i *= 10 {
+	for i := int64(1); i <= 100000000000; i *= 10 {
 		amtlist[i] = 0
 	}
 
 	//fmt.Println(amtlist)
 
-	for i := int64(10000000000); i != 0 && num != 0; i /= 10 {
+	for i := int64(100000000000); i != 0 && num != 0; i /= 10 {
 		//fmt.Println("NUM:", num, " ", i, " ", num / i)
 		if num / i == 0 {
 			continue
 		}
-		amtlist[i] = num / i
+		amtlist[int64(i)] = int(num / i)
 		num = num - i * (num / i)
 	}
 
@@ -157,11 +157,11 @@ func CalcAmount(sum int64) int {
 		if v == 0 {
 			continue
 		}
-		log += "\n" + strconv.FormatInt(sum, 10) + "=" + strconv.FormatInt(v, 10) + "*" + strconv.FormatInt(k, 10) + " ===> " + strconv.Itoa(Amount[k + v])
 		if k == 1 && v == 1 {
 			v -= 1
 		}
-		res += Amount[k + v]
+		res += Amount[k + int64(v)]
+		log += "\n" + strconv.FormatInt(sum, 10) + "=" + strconv.Itoa(v) + "*" + strconv.FormatInt(k, 10) + " ===> " + strconv.Itoa(Amount[k + int64(v)])
 		//fmt.Println("res:", Amount[k + v], k + v)
 	}
 

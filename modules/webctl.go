@@ -114,7 +114,7 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 		switch jh["Post"] {
 		case "SaveButton":
 			sum, err := strconv.Atoi(jh["suminput"])
-			if (err != nil) || (sum <= 0) {
+			if (err != nil) || (sum < 0) {
 				enc.Encode("SaveNotOkSUM")
 				break
 			}
@@ -141,7 +141,7 @@ func urlhome(w http.ResponseWriter, r *http.Request) {
 
 		case "CalcButton":
 			sum, err := strconv.Atoi(jh["suminput"])
-			if (err != nil) || (sum <= 0) {
+			if (err != nil) || (sum < 0) {
 				enc.Encode("CalcNotOk")
 				break
 			}
