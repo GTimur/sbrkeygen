@@ -9,12 +9,11 @@ ul {
 {{define "title"}}{{.Title}} {{end}}
 {{define "body"}}
 {{.Body}}
-<form class="form-horizontal" id="register-data" action="javascript:void(null);" method="post">
-<fieldset>
-<div class="jumbotron text-center">
+<div class="jumbotron myJumbotron text-center">
   <h1>SBERBANK TELEX KEY GENERATOR</h1>
   <p>Утилита формирования ключа для TELEX</p> 
 </div>
+<form class="form-horizontal" id="register-data" action="javascript:void(null);" method="post">
 <!-- Text input-->
 <div class="form-group">
   <label class="col-md-2 control-label" for="suminput">Укажите сумму сделки</label>  
@@ -144,10 +143,6 @@ ul {
 	<button id="exitbutton" name="exitbutton" class="btn btn-danger">Выход</button>    
   </div>
 </div>
-
-
-
-</fieldset>
 </form>
 {{end}}
 {{define "scripts"}}

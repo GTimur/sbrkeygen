@@ -1,17 +1,11 @@
-﻿body { padding-bottom: 70px; padding-top: 70px; }
-
-#container
-{
- background:#fff;
- margin:0 auto;
- text-align:center;
-}
-
-input[type="radio"], input[type="checkbox"] {
-    line-height: normal;
-    margin: 0;
-}
+﻿body { padding-bottom: 70px; padding-top: 70px ; }
 
 td.vcenter {
     vertical-align: middle;
+}
+
+.myJumbotron {
+    background-color: #89AC76; /*#44944A;*/
+    color:white;
+    padding: 10px;
 }
